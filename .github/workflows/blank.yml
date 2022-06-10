@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    tribe-ui-pr-checks:
+        name: PR Checks
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Read Node Version
+              run: echo ::set-output name=NVMRC::$(cat tribe-ui/.nvmrc)
+              id: nvmrc
+
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: '${{ steps.nvmrc.outputs.NVMRC }}'
+
+            - name: Install Packages in root directory
+              run: npm ci
+
+            - name: Install Packages
+              working-directory: client
+              run: npm ci
+
+            - name: ESLint
+              working-directory: client
+              run: npm run lint
+
+            - name: Prettier
+              working-directory: client
+              run: npm run prettier-check
+
+            - name: Build
+              working-directory: client
+              run: npm run build
