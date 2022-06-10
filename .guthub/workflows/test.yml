@@ -1,7 +1,9 @@
 on:
     pull_request:
-        branches: main
-
+        branches: [main]
+        
+    workflow_dispatch:
+    
 jobs:
     tribe-ui-pr-checks:
         name: PR Checks
